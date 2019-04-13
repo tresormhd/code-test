@@ -1,11 +1,19 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const config = require('./config/config')
+var path = require('path')
+
+const mysql = require('mysql');
+
+var connection = mysql.createConnection(config.db);
+connection.connect();
 
 
 //moteur templete
-app.set('views','./views');
+app.set('views','views');
 app.set('view engine','ejs')
+var Users = require('./models/Users-class')(connection)  // On charge la classe utilisateur
 
 //middleware
 // app.use(express.static('public'))
@@ -26,14 +34,23 @@ app.post('/',(request,response) =>{
     //         {
     //             response.render('pages/index',{ error:"vous n'avez pas rempli tous les champs ! remplisez les champs svp "})
     //         }else{
-                console.log(request.body) 
+                let user = Users.add(request.body.nom, request.body.prenom, request.body.email, request.body.password, request.body.telephone)
                 const remercie ='merci de nous faire confiance'
-                 response.render('pages/login',{ test: remercie})
+                 response.render('/pages/login',{ test: user})
             // }
 
+})
+
+app.get('/login', (request , response) => {
+    response.render('/pages/login.ejs')
+})
+
+app.post('/login', (request , response) => {
+    let user = Users.getByEmail(request.body.email)
+    response.render('/pages/login', {test : user})
 })
     // console.log(request.body) 
     // console.log('va dormi')
 
 
-app.listen(9090,(request,response) =>{ console.log('demare sur le port 9090') })
+app.listen(config.port,(request,response) =>{ console.log('demare sur le port '+ config.port) })

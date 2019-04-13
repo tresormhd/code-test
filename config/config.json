@@ -1,0 +1,9 @@
+{
+  "port" : 9090,
+  "db" : {
+    "host" : "localhost",
+    "user" : "root",
+    "password" : "",
+    "database" : "exo-node"
+  }
+}
